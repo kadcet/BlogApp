@@ -1,0 +1,28 @@
+﻿@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.Extensions.Options
+@inject IViewLocalizer localizer
+@inject IOptions<RequestLocalizationOptions> localizationOptions  // Desteklediğim dilleri getirsin .
+
+@{
+    // Context HttpContext Request ve response ile ilgili istek içerisinde bana bütün bilgileri verir
+    // Gelen Request in hangi ip adresinden geldiğini,hangi brovser den geldiğine kadar
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var cultureItems = localizationOptions.Value.SupportedCultures
+    .Select(q => new SelectListItem { Text = q.DisplayName, Value = q.Name })
+    .ToList();
+
+    var returnURL = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path}";
+}
+
+<div>
+    <form asp-controller="Language" asp-action="SetLanguage" asp-route-returnURL="@returnURL">
+        <select name="culture"
+                onchange="this.form.submit();"
+                class="form-control"
+                asp-for="@requestCulture.RequestCulture.UICulture.Name"
+                asp-items="cultureItems">
+        </select>
+
+    </form>
+</div>
